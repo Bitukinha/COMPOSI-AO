@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nutrimilho Composição</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: barra verde fixa com abas; cada aba é uma ferramenta — painel de formulário à esquerda, tabela à direita */
+:root{
+  --bg:#F4F7F3; --surface:#FFFFFF; --sunk:#EBF1EA; --ink:#14221A; --muted:#5B6C61; --line:#D8E2D9;
+  --accent:#0E7A3B; --accent-ink:#FFFFFF; --accent-soft:#E2F1E7; --corn:#F2B705; --corn-soft:#FFF6D6;
+  --danger:#B42318; --danger-soft:#FDECEA; --warn:#9A5B00; --warn-soft:#FFF1D6;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:8px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1511; --surface:#161F1A; --sunk:#1C2721; --ink:#E4EDE6; --muted:#97A99D; --line:#2A3830;
+  --accent:#3DBA6F; --accent-ink:#04130A; --accent-soft:#183324; --corn:#F5C542; --corn-soft:#2E2710;
+  --danger:#F97066; --danger-soft:#3A1814; --warn:#F7B548; --warn-soft:#33260E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1511; --surface:#161F1A; --sunk:#1C2721; --ink:#E4EDE6; --muted:#97A99D; --line:#2A3830;
+  --accent:#3DBA6F; --accent-ink:#04130A; --accent-soft:#183324; --corn:#F5C542; --corn-soft:#2E2710;
+  --danger:#F97066; --danger-soft:#3A1814; --warn:#F7B548; --warn-soft:#33260E; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--accent)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{background:var(--accent);color:var(--accent-ink);position:sticky;top:env(safe-area-inset-top,0px);z-index:5;border-bottom:4px solid var(--corn)}
+header.top .wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-block:10px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:24px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;letter-spacing:.06em;opacity:.85;text-transform:uppercase}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav.tabs a{color:var(--accent-ink);text-decoration:none;font-weight:600;font-size:14px;padding:7px 12px;border-radius:6px;opacity:.85}
+nav.tabs a:hover{opacity:1;background:rgba(255,255,255,.12)}
+nav.tabs a[aria-current="page"]{opacity:1;background:var(--accent-ink);color:var(--accent)}
+main{padding-block:22px 60px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;letter-spacing:.01em}
+h1{font-size:30px}
+h2{font-size:20px;text-transform:uppercase;letter-spacing:.04em}
+.lead{color:var(--muted);margin:4px 0 18px}
+.view[hidden]{display:none!important}
+
+.grid{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel + .panel{margin-top:0}
+.stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+.step{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent)}
+.step b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:14px}
+.hint{color:var(--muted);font-size:13px;margin:0}
+
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--corn-soft);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0;text-transform:none;letter-spacing:0;font-weight:400}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--corn);outline-offset:1px;border-color:var(--corn)}
+input[type=number]{font-variant-numeric:tabular-nums}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;font-size:14px;border-radius:6px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--corn);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary:hover{filter:brightness(1.08);color:var(--accent-ink)}
+button.danger{color:var(--danger);border-color:var(--danger-soft);background:var(--danger-soft)}
+button.danger:hover{border-color:var(--danger)}
+button.sm{padding:4px 9px;font-size:13px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.status{min-height:22px;font-weight:600;font-size:14px;color:var(--accent)}
+.status.err{color:var(--danger)}
+
+.prodhead{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+.prodhead .name{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.15}
+.prodhead .code{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--danger-soft);color:var(--danger)}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;font-weight:600;padding:9px 10px;background:var(--sunk);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.c{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600;white-space:nowrap}
+td.act{white-space:nowrap;text-align:right}
+#cadLista td:nth-child(3),#fichaLista td:nth-child(3),#prodLista td:nth-child(2){min-width:220px}
+tbody tr.editing td{background:var(--corn-soft)}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover td{background:var(--sunk)}
+tfoot td{background:var(--sunk);font-weight:600}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+
+.check{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+@media (max-width:520px){.check{grid-template-columns:minmax(0,1fr)}}
+.check > div{background:var(--surface);padding:10px 14px}
+.check .k{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.check .v{font-family:var(--f-display);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.check .v.ok{color:var(--accent)} .check .v.warn{color:var(--warn)} .check .v.bad{color:var(--danger)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px}
+.toolbar > *{min-width:0}
+.toolbar .grow{flex:1 1 240px}
+
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.tile .k{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.tile .v{font-family:var(--f-display);font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile .s{font-size:13px;color:var(--muted)}
+.cols2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:760px){.cols2{grid-template-columns:minmax(0,1fr)}}
+.bar{height:8px;border-radius:4px;background:var(--sunk);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+
+.banner{padding:10px 14px;border-radius:var(--r);background:var(--warn-soft);color:var(--warn);font-weight:600;margin-bottom:16px}
+.overlay{position:fixed;inset:0;background:rgba(10,20,14,.5);display:grid;place-items:center;z-index:50;padding:16px}
+.modal{background:var(--surface);color:var(--ink);border-radius:10px;max-width:460px;width:100%;padding:20px;display:flex;flex-direction:column;gap:14px;border-top:4px solid var(--accent)}
+.modal.danger{border-top-color:var(--danger)}
+.modal p{margin:0;white-space:pre-line}
+.modal .btns{justify-content:flex-end}
+@media (prefers-reduced-motion:no-preference){.modal{animation:pop .14s ease-out}@keyframes pop{from{transform:translateY(6px);opacity:.6}}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand">Nutrimilho<small>Composição de produtos</small></div>
+  <nav class="tabs" aria-label="Seções">
+    <a href="#composicao" data-tab="composicao">Cadastro</a>
+    <a href="#ficha" data-tab="ficha">Ficha técnica</a>
+    <a href="#produtos" data-tab="produtos">Produtos</a>
+    <a href="#resumo" data-tab="resumo">Resumo</a>
+  </nav>
+</div></header>
+
+<datalist id="dl-itens"></datalist>
+<datalist id="dl-cat"></datalist>
+
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- CADASTRO -->
+  <section class="view" id="v-composicao">
+    <h1>Cadastro de composição</h1>
+    <p class="lead">Escolha o produto, adicione os componentes e as quantidades por unidade.</p>
+    <div class="grid">
+      <div class="stack">
+        <div class="panel">
+          <div class="step"><b>1</b>Produto</div>
+          <label class="f">Produto<input id="inProduto" list="dl-itens" placeholder="Digite o código ou o nome" autocomplete="off"></label>
+        </div>
+        <div class="panel" id="pComp">
+          <div class="step"><b>2</b>Componente</div>
+          <label class="f">Componente<input id="inComponente" list="dl-itens" placeholder="Digite o código ou o nome" autocomplete="off"></label>
+          <div class="row2">
+            <label class="f">Quantidade<input id="inQtd" inputmode="decimal" placeholder="0,000" autocomplete="off"></label>
+            <label class="f">Unidade<select id="inUnidade"><option>kg</option><option>g</option><option>t</option><option>un</option><option>L</option><option>mL</option><option>m</option><option>%</option></select></label>
+          </div>
+          <label class="f">Observação<input id="inObs" autocomplete="off"></label>
+          <p class="hint">Quantidade por 1 unidade do produto: 1 saco, 1 big bag, ou 1 kg nos itens a granel e por kg.</p>
+          <div class="btns">
+            <button class="primary" id="btAdd">Adicionar / Atualizar</button>
+            <button id="btLimpar">Limpar</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="step"><b>3</b>Copiar de outro produto</div>
+          <label class="f">Copiar de<input id="inCopiarDe" list="dl-itens" placeholder="Produto modelo" autocomplete="off"></label>
+          <p class="hint">Útil para o mesmo produto em embalagens diferentes. Componentes que já existem são mantidos.</p>
+          <div class="btns"><button id="btCopiar">Copiar composição</button></div>
+        </div>
+        <div class="status" id="msgStatus" role="status"></div>
+      </div>
+
+      <div class="stack">
+        <div class="panel" id="cadHead"></div>
+        <div class="tbl"><table>
+          <thead><tr><th class="n">Nº</th><th>Código</th><th>Componente</th><th class="n">Quantidade</th><th>Unid.</th><th>Observação</th><th></th></tr></thead>
+          <tbody id="cadLista"></tbody>
+        </table></div>
+        <div class="check" id="cadCheck"></div>
+        <div class="btns"><button class="danger" id="btExcluirTudo">Excluir composição inteira</button><button id="btAbrirFicha">Abrir ficha técnica</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FICHA -->
+  <section class="view" id="v-ficha" hidden>
+    <h1>Ficha técnica de composição</h1>
+    <p class="lead">Escolha o produto e o lote para calcular o consumo de cada componente.</p>
+    <div class="toolbar">
+      <label class="f grow">Produto<input id="fichaProduto" list="dl-itens" placeholder="Digite o código ou o nome" autocomplete="off"></label>
+      <label class="f" style="width:170px">Lote (unidades)<input id="fichaLote" inputmode="decimal" value="100" autocomplete="off"></label>
+      <button id="btFichaCsv">Baixar CSV</button>
+    </div>
+    <div class="panel" id="fichaHead" style="margin-bottom:12px"></div>
+    <div class="tbl"><table>
+      <thead><tr><th class="n">Nº</th><th>Código</th><th>Componente</th><th class="n">Qtd por unidade</th><th>Unid.</th><th class="n">Qtd p/ o lote</th><th>Observação</th></tr></thead>
+      <tbody id="fichaLista"></tbody>
+      <tfoot id="fichaTot"></tfoot>
+    </table></div>
+  </section>
+
+  <!-- PRODUTOS -->
+  <section class="view" id="v-produtos" hidden>
+    <h1>Catálogo de produtos e insumos</h1>
+    <p class="lead">Itens por código, categoria, linha e embalagem. Clique numa linha para abrir a composição.</p>
+    <div class="toolbar">
+      <label class="f grow">Buscar<input id="busca" placeholder="Parte do nome ou código" autocomplete="off"></label>
+      <label class="f" style="flex:0 1 240px">Categoria<select id="filtroCat"><option value="">Todas</option></select></label>
+      <button class="primary" id="btNovo">Novo item</button>
+      <button id="btCompCsv">Exportar composições</button>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Código</th><th>Descrição</th><th>Categoria</th><th>Linha / Marca</th><th>Embalagem</th><th class="n">Peso (kg)</th><th>Composição</th><th></th></tr></thead>
+      <tbody id="prodLista"></tbody>
+    </table></div>
+    <p class="hint" id="prodTotal" style="margin-top:8px"></p>
+  </section>
+
+  <!-- RESUMO -->
+  <section class="view" id="v-resumo" hidden>
+    <h1>Resumo do portfólio</h1>
+    <p class="lead">Quantos itens existem e quantos já têm a composição cadastrada.</p>
+    <div class="tiles" id="tiles"></div>
+    <div class="cols2">
+      <div class="tbl"><table><thead><tr><th>Categoria</th><th class="n">Itens</th><th class="n">% do total</th><th style="width:30%"></th></tr></thead><tbody id="resCat"></tbody></table></div>
+      <div class="tbl"><table><thead><tr><th>Embalagem</th><th class="n">Itens</th><th class="n">Com composição</th></tr></thead><tbody id="resEmb"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="ov" hidden></div>
+
+<script>
+const UNS = ["kg","g","t","un","L","mL","m","%"];
+const EMBS = ["Saco","Big Bag","Granel","Por kg","Pacote","Insumo","Não informado"];
+const S = { prods:new Map(), comp:[], loaded:{p:false,c:false}, db:null, canWrite:true, editComp:null, tab:"composicao" };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = (n, d=3) => Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const num = s => { s = String(s ?? "").trim(); if(!s) return NaN; if(s.includes(",")) s = s.replace(/\./g,"").replace(",","."); return Number(s); };
+
+// "16 - CANJIQUINHA..." -> 16
+function codigoDe(rotulo){
+  let s = String(rotulo ?? "").trim(); const p = s.indexOf(" - ");
+  if(p > 0) s = s.slice(0,p);
+  if(!/^\d+$/.test(s)) return null;
+  return Number(s);
+}
+const rotulo = cod => { const p = S.prods.get(cod); return p ? `${cod} - ${p.desc}` : String(cod); };
+const compDe = prod => S.comp.filter(c => c.prod === prod).sort((a,b) => a.comp - b.comp);
+const acharComp = (prod, comp) => S.comp.find(c => c.prod === prod && c.comp === comp);
+const toKg = (q, un) => un === "kg" ? q : un === "g" ? q/1000 : un === "t" ? q*1000 : null;
+// peso de referência: o peso do produto, ou 1 kg para granel / por kg
+const pesoRef = p => p?.peso ? p.peso : (p && (p.emb === "Granel" || p.emb === "Por kg") ? 1 : null);
+
+/* ---------- mensagens e diálogos ---------- */
+function aviso(msg, erro=false){ const el = $("msgStatus"); el.textContent = msg; el.classList.toggle("err", erro); }
+function perguntar({titulo, texto, ok="Confirmar", perigo=false}){
+  return new Promise(res => {
+    const ov = $("ov");
+    ov.innerHTML = `<div class="modal ${perigo?"danger":""}" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">${esc(titulo)}</h2><p>${esc(texto)}</p><div class="btns"><button id="mNo">Cancelar</button><button id="mOk" class="${perigo?"danger":"primary"}">${esc(ok)}</button></div></div>`;
+    ov.hidden = false;
+    const fim = v => { ov.hidden = true; ov.innerHTML = ""; document.removeEventListener("keydown", kd); res(v); };
+    const kd = e => { if(e.key === "Escape") fim(false); };
+    document.addEventListener("keydown", kd);
+    $("mNo").onclick = () => fim(false); $("mOk").onclick = () => fim(true);
+    ov.onclick = e => { if(e.target === ov) fim(false); };
+    (perigo ? $("mNo") : $("mOk")).focus();
+  });
+}
+function formItem(p){
+  return new Promise(res => {
+    const ov = $("ov"), novo = !p; p = p || {cod:"",desc:"",cat:"Matéria-prima",linha:"—",emb:"Não informado",peso:null};
+    ov.innerHTML = `<form class="modal" id="fItem" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">${novo?"Novo item":"Editar item "+p.cod}</h2>
+      <div class="row2"><label class="f">Código<input id="iCod" inputmode="numeric" value="${esc(p.cod)}" ${novo?"":"disabled"} required></label>
+      <label class="f">Peso (kg)<input id="iPeso" inputmode="decimal" value="${p.peso ?? ""}" placeholder="vazio = sem peso"></label></div>
+      <label class="f">Descrição<input id="iDesc" value="${esc(p.desc)}" required></label>
+      <label class="f">Categoria<input id="iCat" list="dl-cat" value="${esc(p.cat)}"></label>
+      <div class="row2"><label class="f">Linha / Marca<input id="iLinha" value="${esc(p.linha)}"></label>
+      <label class="f">Embalagem<select id="iEmb">${EMBS.map(e=>`<option ${e===p.emb?"selected":""}>${e}</option>`).join("")}</select></label></div>
+      <div class="status err" id="iErr"></div>
+      <div class="btns"><button type="button" id="mNo">Cancelar</button><button class="primary">Salvar</button></div></form>`;
+    ov.hidden = false;
+    const fim = v => { ov.hidden = true; ov.innerHTML = ""; res(v); };
+    $("mNo").onclick = () => fim(null);
+    $(novo ? "iCod" : "iDesc").focus();
+    $("fItem").onsubmit = e => {
+      e.preventDefault();
+      const cod = novo ? codigoDe($("iCod").value) : p.cod, err = $("iErr");
+      if(cod === null) return err.textContent = "O código precisa ser numérico.";
+      if(novo && S.prods.has(cod)) return err.textContent = `Já existe um item com o código ${cod}.`;
+      const desc = $("iDesc").value.trim().toUpperCase();
+      if(!desc) return err.textContent = "Informe a descrição.";
+      const pesoTxt = $("iPeso").value.trim(), peso = pesoTxt ? num(pesoTxt) : null;
+      if(pesoTxt && !(peso > 0)) return err.textContent = "O peso precisa ser um número maior que zero.";
+      fim({cod, desc, cat:$("iCat").value.trim() || "Não informado", linha:$("iLinha").value.trim() || "—", emb:$("iEmb").value, peso});
+    };
+  });
+}
+
+/* ---------- API ---------- */
+async function api(metodo, rota, corpo){
+  let r;
+  try {
+    r = await fetch("/api/" + rota, {method:metodo, headers:corpo ? {"Content-Type":"application/json"} : {}, body:corpo ? JSON.stringify(corpo) : undefined});
+  } catch { throw new Error("Sem conexão com o servidor. Verifique a internet e tente de novo."); }
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error(j.erro || "Não foi possível salvar agora. Tente de novo em alguns segundos.");
+  return j;
+}
+async function carregar(){
+  try {
+    const d = await api("GET", "dados");
+    S.prods = new Map(d.produtos.map(p => [p.cod, p]));
+    S.comp = d.composicao;
+    $("banner").hidden = true;
+  } catch(e){ const b = $("banner"); b.hidden = false; b.textContent = e.message; }
+  S.loaded = {p:true, c:true}; renderDatalists(); renderTudo();
+}
+// grava, recarrega os dados e devolve a resposta do servidor (ou null se falhou)
+async function gravar(fn){
+  try { const r = await fn(); await carregar(); return r; }
+  catch(e){ aviso(e.message, true); return null; }
+}
+
+/* ---------- ações do cadastro ---------- */
+function lerProduto(){
+  const prod = codigoDe($("inProduto").value);
+  if(prod === null || !S.prods.has(prod)){ aviso("Selecione o produto no campo Produto.", true); $("inProduto").focus(); return null; }
+  return prod;
+}
+async function adicionar(){
+  const prod = lerProduto(); if(prod === null) return;
+  const comp = codigoDe($("inComponente").value);
+  if(comp === null || !S.prods.has(comp)){ aviso("Selecione o componente.", true); $("inComponente").focus(); return; }
+  if(comp === prod){ aviso("Um item não pode ser componente dele mesmo.", true); return; }
+  const qtdTxt = $("inQtd").value;
+  if(!qtdTxt.trim()){ aviso("Informe a quantidade.", true); $("inQtd").focus(); return; }
+  const qtd = num(qtdTxt);
+  if(!Number.isFinite(qtd)){ aviso("A quantidade precisa ser um número.", true); $("inQtd").focus(); return; }
+  if(qtd <= 0){ aviso("A quantidade precisa ser maior que zero.", true); $("inQtd").focus(); return; }
+  const un = $("inUnidade").value, obs = $("inObs").value.trim();
+  const ja = acharComp(prod, comp);
+  if(ja && S.editComp !== comp){
+    const ok = await perguntar({titulo:"Componente já cadastrado", texto:`Este componente já faz parte da composição (${fmt(ja.qtd)} ${ja.un}).\n\nAtualizar para ${fmt(qtd)} ${un}?`, ok:"Atualizar"});
+    if(!ok) return;
+  }
+  const feito = await gravar(() => api("PUT", "composicao", {prod, comp, qtd, un, obs}));
+  if(!feito) return;
+  S.editComp = null;
+  $("inComponente").value = ""; $("inQtd").value = ""; $("inObs").value = "";
+  aviso(`Componente ${comp} ${ja ? "atualizado" : "adicionado"} na composição do produto ${prod}.`);
+  renderCadastro(); $("inComponente").focus();
+}
+function editar(comp){
+  const prod = lerProduto(); if(prod === null) return;
+  const c = acharComp(prod, comp); if(!c) return;
+  S.editComp = comp;
+  $("inComponente").value = rotulo(comp); $("inQtd").value = fmt(c.qtd).replace(/\./g,""); $("inUnidade").value = c.un; $("inObs").value = c.obs || "";
+  aviso("Altere os campos e clique em Adicionar / Atualizar.");
+  renderCadastro(); $("inQtd").focus(); $("inQtd").select();
+}
+async function remover(comp){
+  const prod = lerProduto(); if(prod === null) return;
+  const ok = await perguntar({titulo:"Remover componente", texto:`Remover da composição do produto ${prod}?\n\n${rotulo(comp)}`, ok:"Remover", perigo:true});
+  if(!ok) return;
+  if(await gravar(() => api("DELETE", `composicao?prod=${prod}&comp=${comp}`))){
+    if(S.editComp === comp) limpar(false);
+    aviso(`Componente ${comp} removido.`);
+  }
+}
+function limpar(foco=true){
+  S.editComp = null;
+  ["inComponente","inQtd","inObs","inCopiarDe"].forEach(id => $(id).value = "");
+  aviso(""); renderCadastro(); if(foco) $("inComponente").focus();
+}
+async function copiar(){
+  const prod = lerProduto(); if(prod === null) return;
+  const orig = codigoDe($("inCopiarDe").value);
+  if(orig === null || !S.prods.has(orig)){ aviso("Escolha no campo 'Copiar de' o produto que servirá de modelo.", true); $("inCopiarDe").focus(); return; }
+  if(orig === prod){ aviso("Escolha um produto diferente do atual.", true); return; }
+  if(!compDe(orig).length){ aviso(`O produto ${orig} ainda não tem composição cadastrada.`, true); return; }
+  const r = await gravar(() => api("POST", "copiar", {de:orig, para:prod}));
+  if(r){ $("inCopiarDe").value = ""; aviso(`${r.copiados} componente(s) copiado(s) do produto ${orig}` + (r.pulados ? ` (${r.pulados} já existia(m) e foi(ram) mantido(s))` : "") + "."); }
+}
+async function excluirTudo(){
+  const prod = lerProduto(); if(prod === null) return;
+  const lista = compDe(prod);
+  if(!lista.length){ aviso("Este produto não tem componentes cadastrados.", true); return; }
+  const ok = await perguntar({titulo:"Excluir composição", texto:`Excluir TODOS os ${lista.length} componente(s) do produto ${prod}?\nEsta ação não pode ser desfeita.`, ok:"Excluir tudo", perigo:true});
+  if(!ok) return;
+  if(await gravar(() => api("DELETE", `composicao?prod=${prod}`))){ limpar(false); aviso(`${lista.length} componente(s) excluído(s) do produto ${prod}.`); }
+}
+
+/* ---------- ações do catálogo ---------- */
+async function salvarItem(p){
+  const item = await formItem(p); if(!item) return;
+  if(await gravar(() => api(p ? "PUT" : "POST", "produtos", item))) aviso(`Item ${item.cod} ${p ? "atualizado" : "cadastrado. Ele já aparece nas listas de produto e de componente"}.`);
+}
+async function excluirItem(cod){
+  const usos = S.comp.filter(c => c.prod === cod || c.comp === cod).length;
+  if(usos){ await perguntar({titulo:"Item em uso", texto:`O item ${cod} aparece em ${usos} linha(s) de composição. Remova essas linhas antes de excluir o item.`, ok:"Entendi"}); return; }
+  if(!await perguntar({titulo:"Excluir item", texto:`Excluir do catálogo?\n\n${rotulo(cod)}`, ok:"Excluir", perigo:true})) return;
+  if(await gravar(() => api("DELETE", `produtos?cod=${cod}`))) aviso(`Item ${cod} excluído do catálogo.`);
+}
+function abrirComposicao(cod){ $("inProduto").value = rotulo(cod); limpar(false); location.hash = "composicao"; mostrar("composicao"); }
+
+/* ---------- exportação ---------- */
+const csvLinha = arr => arr.map(v => { v = String(v ?? ""); return /[;"\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; }).join(";");
+const csvNum = n => String(n).replace(".", ",");
+function baixar(nome, linhas){
+  const blob = new Blob(["﻿" + linhas.map(csvLinha).join("\r\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function csvFicha(){
+  const prod = codigoDe($("fichaProduto").value), lote = num($("fichaLote").value);
+  if(prod === null || !S.prods.has(prod)) return;
+  const linhas = [["Produto", rotulo(prod)], ["Lote", csvNum(lote)], [], ["Nº","Código","Componente","Qtd por unidade","Unid.","Qtd p/ o lote","Observação"]];
+  compDe(prod).forEach((c,i) => linhas.push([i+1, c.comp, S.prods.get(c.comp)?.desc ?? "", csvNum(c.qtd), c.un, csvNum(+(c.qtd*lote).toFixed(6)), c.obs]));
+  baixar(`ficha_${prod}_lote_${csvNum(lote)}.csv`, linhas);
+}
+function csvComposicoes(){
+  const linhas = [["Cód. Produto","Produto","Cód. Comp.","Componente","Quantidade","Unid.","Observação"]];
+  [...S.comp].sort((a,b) => a.prod - b.prod || a.comp - b.comp).forEach(c => linhas.push([c.prod, S.prods.get(c.prod)?.desc ?? "", c.comp, S.prods.get(c.comp)?.desc ?? "", csvNum(c.qtd), c.un, c.obs]));
+  baixar("composicoes_nutrimilho.csv", linhas);
+}
+
+/* ---------- render ---------- */
+const carregado = () => S.loaded.p && S.loaded.c;
+function statusComp(p){
+  if(p.emb === "Insumo") return `<span class="chip">Insumo</span>`;
+  const n = compDe(p.cod).length;
+  return n ? `<span class="chip ok">${n} componente${n>1?"s":""}</span>` : `<span class="chip warn">Sem composição</span>`;
+}
+function conferencia(prod){
+  const p = S.prods.get(prod), lista = compDe(prod);
+  let soma = 0, foraKg = 0;
+  lista.forEach(c => { const k = toKg(c.qtd, c.un); if(k === null) foraKg++; else soma += k; });
+  const ref = pesoRef(p);
+  let cls = "", txt = "—";
+  if(!lista.length) txt = "—";
+  else if(ref === null) txt = "Sem peso";
+  else { const d = soma - ref; if(Math.abs(d) < 0.0005){ cls = "ok"; txt = "Confere"; } else { cls = d > 0 ? "bad" : "warn"; txt = (d > 0 ? "+" : "") + fmt(d) + " kg"; } }
+  return {soma, ref, cls, txt, foraKg};
+}
+function renderDatalists(){
+  const ord = [...S.prods.values()].sort((a,b) => a.cod - b.cod);
+  $("dl-itens").innerHTML = ord.map(p => `<option value="${esc(p.cod+" - "+p.desc)}"></option>`).join("");
+  const cats = [...new Set(ord.map(p => p.cat))].sort((a,b) => a.localeCompare(b,"pt-BR"));
+  $("dl-cat").innerHTML = cats.map(c => `<option value="${esc(c)}"></option>`).join("");
+  const f = $("filtroCat"), atual = f.value;
+  f.innerHTML = `<option value="">Todas</option>` + cats.map(c => `<option ${c===atual?"selected":""}>${esc(c)}</option>`).join("");
+}
+function cabecalho(prod){
+  const p = S.prods.get(prod);
+  if(!p) return `<p class="hint">${carregado() ? "Escolha um produto para ver e montar a composição." : "Carregando produtos…"}</p>`;
+  const peso = p.peso ? `${fmt(p.peso,0)} kg` : (pesoRef(p) ? "composição por 1 kg" : "sem peso");
+  return `<div class="prodhead"><span class="code">${p.cod}</span><span class="name">${esc(p.desc)}</span></div>
+    <div class="chips"><span class="chip">${esc(p.cat)}</span>${p.linha && p.linha !== "—" ? `<span class="chip">${esc(p.linha)}</span>` : ""}<span class="chip">${esc(p.emb)} · ${peso}</span>${statusComp(p)}</div>`;
+}
+function renderCadastro(){
+  const prod = codigoDe($("inProduto").value), valido = prod !== null && S.prods.has(prod);
+  $("cadHead").innerHTML = cabecalho(valido ? prod : null);
+  const lista = valido ? compDe(prod) : [];
+  $("cadLista").innerHTML = !valido ? `<tr><td colspan="7" class="empty"><strong>Nenhum produto escolhido</strong>Digite o código ou o nome no campo Produto.</td></tr>`
+    : !lista.length ? `<tr><td colspan="7" class="empty"><strong>Composição vazia</strong>Adicione o primeiro componente no passo 2 ou copie de outro produto no passo 3.</td></tr>`
+    : lista.map((c,i) => `<tr class="${S.editComp===c.comp?"editing":""}"><td class="n">${i+1}</td><td class="c">${c.comp}</td><td>${esc(S.prods.get(c.comp)?.desc ?? "⚠ código não cadastrado em Produtos")}</td><td class="n">${fmt(c.qtd)}</td><td>${esc(c.un)}</td><td>${esc(c.obs)}</td>
+      <td class="act"><button class="sm" data-ed="${c.comp}" ${S.canWrite?"":"disabled"}>Editar</button> <button class="sm danger" data-rm="${c.comp}" ${S.canWrite?"":"disabled"}>Remover</button></td></tr>`).join("");
+  if(valido && lista.length){
+    const k = conferencia(prod);
+    $("cadCheck").hidden = false;
+    $("cadCheck").innerHTML = `<div><div class="k">Soma dos componentes</div><div class="v">${fmt(k.soma)} kg</div>${k.foraKg ? `<div class="hint">${k.foraKg} item(ns) fora de kg/g/t não somado(s)</div>` : ""}</div>
+      <div><div class="k">Peso do produto</div><div class="v">${k.ref === null ? "—" : fmt(k.ref) + " kg"}</div></div>
+      <div><div class="k">Conferência</div><div class="v ${k.cls}">${k.txt}</div></div>`;
+  } else $("cadCheck").hidden = true;
+  $("btExcluirTudo").disabled = !valido || !lista.length || !S.canWrite;
+}
+function renderFicha(){
+  const prod = codigoDe($("fichaProduto").value), valido = prod !== null && S.prods.has(prod);
+  const loteTxt = $("fichaLote").value, lote = num(loteTxt), loteOk = Number.isFinite(lote) && lote > 0;
+  $("fichaHead").innerHTML = cabecalho(valido ? prod : null);
+  const lista = valido ? compDe(prod) : [];
+  $("btFichaCsv").disabled = !lista.length || !loteOk;
+  $("fichaLista").innerHTML = !valido ? `<tr><td colspan="7" class="empty"><strong>Nenhum produto escolhido</strong>Digite o código ou o nome no campo Produto.</td></tr>`
+    : !lista.length ? `<tr><td colspan="7" class="empty"><strong>Este produto ainda não tem composição</strong>Cadastre os componentes na aba Cadastro.</td></tr>`
+    : lista.map((c,i) => `<tr><td class="n">${i+1}</td><td class="c">${c.comp}</td><td>${esc(S.prods.get(c.comp)?.desc ?? "⚠ código não cadastrado")}</td><td class="n">${fmt(c.qtd)}</td><td>${esc(c.un)}</td><td class="n"><strong>${loteOk ? fmt(c.qtd*lote) : "—"}</strong></td><td>${esc(c.obs)}</td></tr>`).join("");
+  if(lista.length && loteOk){
+    const k = conferencia(prod);
+    $("fichaTot").innerHTML = `<tr><td colspan="3">Total em kg (kg, g e t)</td><td class="n">${fmt(k.soma)}</td><td>kg</td><td class="n">${fmt(k.soma*lote)}</td><td>${k.ref !== null ? `Peso do lote: ${fmt(k.ref*lote)} kg` : ""}</td></tr>`;
+  } else $("fichaTot").innerHTML = "";
+}
+function renderProdutos(){
+  const q = $("busca").value.trim().toLowerCase(), cat = $("filtroCat").value;
+  const ord = [...S.prods.values()].sort((a,b) => a.cod - b.cod)
+    .filter(p => (!cat || p.cat === cat) && (!q || String(p.cod).includes(q) || p.desc.toLowerCase().includes(q) || (p.linha||"").toLowerCase().includes(q)));
+  $("prodLista").innerHTML = !carregado() ? `<tr><td colspan="8" class="empty">Carregando produtos…</td></tr>`
+    : !S.prods.size ? `<tr><td colspan="8" class="empty"><strong>Catálogo vazio</strong>Clique em Novo item para cadastrar o primeiro produto ou insumo.</td></tr>`
+    : !ord.length ? `<tr><td colspan="8" class="empty">Nenhum item encontrado para essa busca.</td></tr>`
+    : ord.map(p => `<tr class="click" data-open="${p.cod}"><td class="c">${p.cod}</td><td>${esc(p.desc)}</td><td>${esc(p.cat)}</td><td>${esc(p.linha)}</td><td>${esc(p.emb)}</td><td class="n">${p.peso ? fmt(p.peso,0) : ""}</td><td>${statusComp(p)}</td>
+      <td class="act"><button class="sm" data-edit="${p.cod}" ${S.canWrite?"":"disabled"}>Editar</button> <button class="sm danger" data-del="${p.cod}" ${S.canWrite?"":"disabled"}>Excluir</button></td></tr>`).join("");
+  $("prodTotal").textContent = carregado() ? `${ord.length} de ${S.prods.size} itens` : "";
+  $("btNovo").disabled = !S.canWrite;
+}
+function renderResumo(){
+  const todos = [...S.prods.values()], total = todos.length;
+  const fab = todos.filter(p => p.emb !== "Insumo"), com = fab.filter(p => compDe(p.cod).length).length;
+  const conf = fab.filter(p => compDe(p.cod).length && conferencia(p.cod).cls === "ok").length;
+  $("tiles").innerHTML = [
+    ["Itens no catálogo", total, `${total - fab.length} insumo(s)`],
+    ["Com composição", com, fab.length ? `${Math.round(com/fab.length*100)}% dos produtos` : ""],
+    ["Sem composição", fab.length - com, "produtos que faltam cadastrar"],
+    ["Peso confere", conf, `de ${com} com composição`],
+  ].map(([k,v,s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
+  const grupo = campo => { const m = new Map(); todos.forEach(p => m.set(p[campo], (m.get(p[campo])||[]).concat(p))); return [...m].sort((a,b) => b[1].length - a[1].length || a[0].localeCompare(b[0],"pt-BR")); };
+  const max = Math.max(1, ...grupo("cat").map(g => g[1].length));
+  $("resCat").innerHTML = grupo("cat").map(([c,l]) => `<tr><td>${esc(c)}</td><td class="n">${l.length}</td><td class="n">${total ? fmt(l.length/total*100,1) : 0}%</td><td><div class="bar"><i style="width:${l.length/max*100}%"></i></div></td></tr>`).join("")
+    + `<tr><td><strong>Total</strong></td><td class="n"><strong>${total}</strong></td><td class="n">100%</td><td></td></tr>`;
+  $("resEmb").innerHTML = grupo("emb").map(([e,l]) => `<tr><td>${esc(e)}</td><td class="n">${l.length}</td><td class="n">${e === "Insumo" ? "—" : l.filter(p => compDe(p.cod).length).length}</td></tr>`).join("");
+}
+function renderTudo(){ renderCadastro(); renderFicha(); renderProdutos(); renderResumo(); }
+
+function mostrar(tab){
+  if(!["composicao","ficha","produtos","resumo"].includes(tab)) tab = "composicao";
+  S.tab = tab;
+  document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "v-" + tab);
+  document.querySelectorAll("nav.tabs a").forEach(a => a.toggleAttribute("aria-current", a.dataset.tab === tab) || a.dataset.tab === tab && a.setAttribute("aria-current","page"));
+}
+
+/* ---------- eventos ---------- */
+$("inProduto").addEventListener("input", () => { S.editComp = null; renderCadastro(); });
+$("btAdd").onclick = adicionar;
+$("btLimpar").onclick = () => limpar();
+$("btCopiar").onclick = copiar;
+$("btExcluirTudo").onclick = excluirTudo;
+$("btAbrirFicha").onclick = () => { if($("inProduto").value) $("fichaProduto").value = $("inProduto").value; location.hash = "ficha"; mostrar("ficha"); renderFicha(); $("fichaLote").focus(); };
+["inComponente","inQtd","inObs"].forEach(id => $(id).addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); adicionar(); } }));
+$("cadLista").addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; if(b.dataset.ed) editar(+b.dataset.ed); if(b.dataset.rm) remover(+b.dataset.rm); });
+$("fichaProduto").addEventListener("input", renderFicha);
+$("fichaLote").addEventListener("input", renderFicha);
+$("btFichaCsv").onclick = csvFicha;
+$("btCompCsv").onclick = csvComposicoes;
+$("busca").addEventListener("input", renderProdutos);
+$("filtroCat").addEventListener("change", renderProdutos);
+$("btNovo").onclick = () => salvarItem(null);
+$("prodLista").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if(b?.dataset.edit) return salvarItem(S.prods.get(+b.dataset.edit));
+  if(b?.dataset.del) return excluirItem(+b.dataset.del);
+  const tr = e.target.closest("tr[data-open]"); if(tr) abrirComposicao(+tr.dataset.open);
+});
+window.addEventListener("hashchange", () => mostrar(location.hash.slice(1)));
+
+/* ---------- início ---------- */
+mostrar(location.hash.slice(1));
+renderTudo();
+carregar();
+// traz as alterações feitas por outras pessoas quando a aba volta a ficar visível
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && $("ov").hidden) carregar(); });
+</script>
+
+</body>
+</html>
