@@ -198,8 +198,11 @@ tfoot td{background:var(--sunk);font-weight:600}
     <div class="toolbar">
       <label class="f grow">Produto<input id="fichaProduto" list="dl-itens" placeholder="Digite o código ou o nome" autocomplete="off"></label>
       <label class="f" style="width:170px">Lote (unidades)<input id="fichaLote" inputmode="decimal" value="100" autocomplete="off"></label>
+      <button class="primary" id="btFichaPdf">Baixar PDF</button>
+      <button id="btTodasPdf">PDF de todas as composições</button>
       <button id="btFichaCsv">Baixar CSV</button>
     </div>
+    <div class="status" id="fichaStatus" role="status" style="margin-bottom:8px"></div>
     <div class="panel" id="fichaHead" style="margin-bottom:12px"></div>
     <div class="tbl"><table>
       <thead><tr><th class="n">Nº</th><th>Código</th><th>Componente</th><th class="n">Qtd por unidade</th><th>Unid.</th><th class="n">Qtd p/ o lote</th><th>Observação</th></tr></thead>
@@ -239,6 +242,9 @@ tfoot td{background:var(--sunk);font-weight:600}
 
 <div class="overlay" id="ov" hidden></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <script>
 const UNS = ["kg","g","t","un","L","mL","m","%"];
 const EMBS = ["Saco","Big Bag","Granel","Por kg","Pacote","Insumo","Não informado"];
@@ -263,7 +269,7 @@ const toKg = (q, un) => un === "kg" ? q : un === "g" ? q/1000 : un === "t" ? q*1
 const pesoRef = p => p?.peso ? p.peso : (p && (p.emb === "Granel" || p.emb === "Por kg") ? 1 : null);
 
 /* ---------- mensagens e diálogos ---------- */
-function aviso(msg, erro=false){ const el = $("msgStatus"); el.textContent = msg; el.classList.toggle("err", erro); }
+function aviso(msg, erro=false){ for(const el of [$("msgStatus"), $("fichaStatus")]){ el.textContent = msg; el.classList.toggle("err", erro); } }
 function perguntar({titulo, texto, ok="Confirmar", perigo=false}){
   return new Promise(res => {
     const ov = $("ov");
@@ -424,6 +430,73 @@ function baixar(nome, linhas){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
+// Uma página A4 por produto: cabeçalho, dados do item, tabela da composição, conferência e assinatura
+function pdfFichas(prods, nome){
+  if(!window.jspdf){ aviso("O gerador de PDF não carregou. Verifique a internet e recarregue a página.", true); return; }
+  const lote = num($("fichaLote").value);
+  if(!(lote > 0)){ aviso("Informe um lote maior que zero.", true); return; }
+  if(!prods.length){ aviso("Nenhum produto tem composição cadastrada.", true); return; }
+  const doc = new window.jspdf.jsPDF({unit:"mm", format:"a4"});
+  const VERDE = [14,122,59], MILHO = [242,183,5], CINZA = [91,108,97], W = 210, M = 14;
+  const agora = new Date().toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"});
+
+  prods.forEach((prod, i) => {
+    if(i) doc.addPage();
+    const p = S.prods.get(prod), lista = compDe(prod), k = conferencia(prod);
+    doc.setFillColor(...VERDE); doc.rect(0, 0, W, 22, "F");
+    doc.setFillColor(...MILHO); doc.rect(0, 22, W, 1.5, "F");
+    doc.setTextColor(255); doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text("NUTRIMILHO", M, 11);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Ficha técnica de composição", M, 17);
+    doc.text(agora, W - M, 17, {align:"right"});
+
+    doc.setTextColor(20); doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+    const titulo = doc.splitTextToSize(`${p.cod} - ${p.desc}`, W - 2*M);
+    doc.text(titulo, M, 33);
+    let y = 33 + titulo.length * 5.5;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...CINZA);
+    const peso = p.peso ? `${fmt(p.peso,0)} kg` : (pesoRef(p) ? "composição por 1 kg" : "sem peso");
+    doc.text([p.cat, p.linha && p.linha !== "—" ? p.linha : null, `${p.emb} · ${peso}`].filter(Boolean).join("   ·   "), M, y);
+    y += 6;
+    doc.setTextColor(20); doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
+    doc.text(`Lote: ${fmt(lote, Number.isInteger(lote) ? 0 : 3)} unidade(s) do produto`, M, y);
+
+    doc.autoTable({
+      startY: y + 4, margin: {left:M, right:M}, theme: "grid",
+      head: [["Nº","Código","Componente","Qtd por unidade","Unid.","Qtd p/ o lote","Observação"]],
+      body: lista.map((c, n) => [n+1, c.comp, S.prods.get(c.comp)?.desc ?? "código não cadastrado", fmt(c.qtd), c.un, fmt(c.qtd*lote), c.obs || ""]),
+      foot: lista.length ? [["", "", "Total em kg (kg, g e t)", fmt(k.soma), "kg", fmt(k.soma*lote), k.ref !== null ? `Peso do lote: ${fmt(k.ref*lote)} kg` : ""]] : undefined,
+      styles: {fontSize: 8.5, cellPadding: 1.8, lineColor: [216,226,217], textColor: 20, valign: "middle"},
+      headStyles: {fillColor: VERDE, textColor: 255, fontStyle: "bold"},
+      footStyles: {fillColor: [235,241,234], textColor: 20, fontStyle: "bold"},
+      alternateRowStyles: {fillColor: [246,249,245]},
+      columnStyles: {0:{halign:"right", cellWidth:9}, 1:{cellWidth:15}, 3:{halign:"right", cellWidth:24}, 4:{cellWidth:12}, 5:{halign:"right", cellWidth:24}, 6:{cellWidth:36}},
+    });
+    y = doc.lastAutoTable.finalY + 8;
+    if(!lista.length){ doc.setFont("helvetica", "normal"); doc.text("Sem composição cadastrada.", M, y); y += 8; }
+    else {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+      const cor = k.cls === "ok" ? VERDE : k.cls === "bad" ? [180,35,24] : k.cls === "warn" ? [154,91,0] : [20,20,20];
+      doc.setTextColor(20); doc.text("Conferência de peso:", M, y);
+      doc.setTextColor(...cor); doc.text(k.ref === null ? "produto sem peso cadastrado" : k.txt, M + 40, y);
+      if(k.foraKg){ doc.setTextColor(...CINZA); doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.text(`${k.foraKg} item(ns) em unidade fora de kg/g/t não entra(m) na soma.`, M, y + 5); }
+    }
+    const ya = Math.max(y + 24, 255);
+    if(ya < 280){
+      doc.setDrawColor(150); doc.setTextColor(...CINZA); doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+      doc.line(M, ya, M + 80, ya); doc.text("Responsável", M, ya + 4.5);
+      doc.line(W - M - 60, ya, W - M, ya); doc.text("Data", W - M - 60, ya + 4.5);
+    }
+  });
+
+  const total = doc.getNumberOfPages();
+  for(let i = 1; i <= total; i++){
+    doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...CINZA);
+    doc.text("Nutrimilho · Composição de produtos", M, 290);
+    doc.text(`Página ${i} de ${total}`, W - M, 290, {align:"right"});
+  }
+  doc.save(nome);
+  aviso(prods.length > 1 ? `PDF gerado com ${prods.length} fichas.` : "PDF gerado.");
+}
 function csvFicha(){
   const prod = codigoDe($("fichaProduto").value), lote = num($("fichaLote").value);
   if(prod === null || !S.prods.has(prod)) return;
@@ -492,7 +565,8 @@ function renderFicha(){
   const loteTxt = $("fichaLote").value, lote = num(loteTxt), loteOk = Number.isFinite(lote) && lote > 0;
   $("fichaHead").innerHTML = cabecalho(valido ? prod : null);
   const lista = valido ? compDe(prod) : [];
-  $("btFichaCsv").disabled = !lista.length || !loteOk;
+  $("btFichaCsv").disabled = $("btFichaPdf").disabled = !lista.length || !loteOk;
+  $("btTodasPdf").disabled = !loteOk || !S.comp.length;
   $("fichaLista").innerHTML = !valido ? `<tr><td colspan="7" class="empty"><strong>Nenhum produto escolhido</strong>Digite o código ou o nome no campo Produto.</td></tr>`
     : !lista.length ? `<tr><td colspan="7" class="empty"><strong>Este produto ainda não tem composição</strong>Cadastre os componentes na aba Cadastro.</td></tr>`
     : lista.map((c,i) => `<tr><td class="n">${i+1}</td><td class="c">${c.comp}</td><td>${esc(S.prods.get(c.comp)?.desc ?? "⚠ código não cadastrado")}</td><td class="n">${fmt(c.qtd)}</td><td>${esc(c.un)}</td><td class="n"><strong>${loteOk ? fmt(c.qtd*lote) : "—"}</strong></td><td>${esc(c.obs)}</td></tr>`).join("");
@@ -550,6 +624,8 @@ $("cadLista").addEventListener("click", e => { const b = e.target.closest("butto
 $("fichaProduto").addEventListener("input", renderFicha);
 $("fichaLote").addEventListener("input", renderFicha);
 $("btFichaCsv").onclick = csvFicha;
+$("btFichaPdf").onclick = () => { const prod = codigoDe($("fichaProduto").value); if(prod !== null && S.prods.has(prod)) pdfFichas([prod], `ficha_tecnica_${prod}.pdf`); };
+$("btTodasPdf").onclick = () => pdfFichas([...new Set(S.comp.map(c => c.prod))].filter(p => S.prods.has(p)).sort((a,b) => a - b), "fichas_tecnicas_nutrimilho.pdf");
 $("btCompCsv").onclick = csvComposicoes;
 $("busca").addEventListener("input", renderProdutos);
 $("filtroCat").addEventListener("change", renderProdutos);
