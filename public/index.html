@@ -109,7 +109,7 @@ tfoot td{background:var(--sunk);font-weight:600}
 .toolbar > *{min-width:0}
 .toolbar .grow{flex:1 1 240px}
 
-.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
 @media (max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
 .tile .k{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
@@ -251,7 +251,8 @@ const EMBS = ["Saco","Big Bag","Granel","Por kg","Pacote","Insumo","Não informa
 const S = { prods:new Map(), comp:[], loaded:{p:false,c:false}, db:null, canWrite:true, editComp:null, tab:"composicao" };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const fmt = (n, d=3) => Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+// mostra o valor exato (sem arredondar): d = casas mínimas; o limite de 10 casas só elimina ruído de ponto flutuante
+const fmt = (n, d=3, max=10) => Number(n).toLocaleString("pt-BR",{minimumFractionDigits:Math.min(d,max),maximumFractionDigits:max});
 const num = s => { s = String(s ?? "").trim(); if(!s) return NaN; if(s.includes(",")) s = s.replace(/\./g,"").replace(",","."); return Number(s); };
 
 // "16 - CANJIQUINHA..." -> 16
@@ -442,7 +443,7 @@ function pdfFichas(prods, nome){
 
   prods.forEach((prod, i) => {
     if(i) doc.addPage();
-    const p = S.prods.get(prod), lista = compDe(prod), k = conferencia(prod);
+    const p = S.prods.get(prod), lista = compDe(prod);
     doc.setFillColor(...VERDE); doc.rect(0, 0, W, 22, "F");
     doc.setFillColor(...MILHO); doc.rect(0, 22, W, 1.5, "F");
     doc.setTextColor(255); doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text("NUTRIMILHO", M, 11);
@@ -464,7 +465,6 @@ function pdfFichas(prods, nome){
       startY: y + 4, margin: {left:M, right:M}, theme: "grid",
       head: [["Nº","Código","Componente","Qtd por unidade","Unid.","Qtd p/ o lote","Observação"]],
       body: lista.map((c, n) => [n+1, c.comp, S.prods.get(c.comp)?.desc ?? "código não cadastrado", fmt(c.qtd), c.un, fmt(c.qtd*lote), c.obs || ""]),
-      foot: lista.length ? [["", "", "Total em kg (kg, g e t)", fmt(k.soma), "kg", fmt(k.soma*lote), k.ref !== null ? `Peso do lote: ${fmt(k.ref*lote)} kg` : ""]] : undefined,
       styles: {fontSize: 8.5, cellPadding: 1.8, lineColor: [216,226,217], textColor: 20, valign: "middle"},
       headStyles: {fillColor: VERDE, textColor: 255, fontStyle: "bold"},
       footStyles: {fillColor: [235,241,234], textColor: 20, fontStyle: "bold"},
@@ -473,13 +473,6 @@ function pdfFichas(prods, nome){
     });
     y = doc.lastAutoTable.finalY + 8;
     if(!lista.length){ doc.setFont("helvetica", "normal"); doc.text("Sem composição cadastrada.", M, y); y += 8; }
-    else {
-      doc.setFont("helvetica", "bold"); doc.setFontSize(10);
-      const cor = k.cls === "ok" ? VERDE : k.cls === "bad" ? [180,35,24] : k.cls === "warn" ? [154,91,0] : [20,20,20];
-      doc.setTextColor(20); doc.text("Conferência de peso:", M, y);
-      doc.setTextColor(...cor); doc.text(k.ref === null ? "produto sem peso cadastrado" : k.txt, M + 40, y);
-      if(k.foraKg){ doc.setTextColor(...CINZA); doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.text(`${k.foraKg} item(ns) em unidade fora de kg/g/t não entra(m) na soma.`, M, y + 5); }
-    }
     const ya = Math.max(y + 24, 255);
     if(ya < 280){
       doc.setDrawColor(150); doc.setTextColor(...CINZA); doc.setFont("helvetica", "normal"); doc.setFontSize(9);
@@ -501,7 +494,7 @@ function csvFicha(){
   const prod = codigoDe($("fichaProduto").value), lote = num($("fichaLote").value);
   if(prod === null || !S.prods.has(prod)) return;
   const linhas = [["Produto", rotulo(prod)], ["Lote", csvNum(lote)], [], ["Nº","Código","Componente","Qtd por unidade","Unid.","Qtd p/ o lote","Observação"]];
-  compDe(prod).forEach((c,i) => linhas.push([i+1, c.comp, S.prods.get(c.comp)?.desc ?? "", csvNum(c.qtd), c.un, csvNum(+(c.qtd*lote).toFixed(6)), c.obs]));
+  compDe(prod).forEach((c,i) => linhas.push([i+1, c.comp, S.prods.get(c.comp)?.desc ?? "", csvNum(c.qtd), c.un, csvNum(+(c.qtd*lote).toFixed(10)), c.obs]));
   baixar(`ficha_${prod}_lote_${csvNum(lote)}.csv`, linhas);
 }
 function csvComposicoes(){
@@ -551,13 +544,7 @@ function renderCadastro(){
     : !lista.length ? `<tr><td colspan="7" class="empty"><strong>Composição vazia</strong>Adicione o primeiro componente no passo 2 ou copie de outro produto no passo 3.</td></tr>`
     : lista.map((c,i) => `<tr class="${S.editComp===c.comp?"editing":""}"><td class="n">${i+1}</td><td class="c">${c.comp}</td><td>${esc(S.prods.get(c.comp)?.desc ?? "⚠ código não cadastrado em Produtos")}</td><td class="n">${fmt(c.qtd)}</td><td>${esc(c.un)}</td><td>${esc(c.obs)}</td>
       <td class="act"><button class="sm" data-ed="${c.comp}" ${S.canWrite?"":"disabled"}>Editar</button> <button class="sm danger" data-rm="${c.comp}" ${S.canWrite?"":"disabled"}>Remover</button></td></tr>`).join("");
-  if(valido && lista.length){
-    const k = conferencia(prod);
-    $("cadCheck").hidden = false;
-    $("cadCheck").innerHTML = `<div><div class="k">Soma dos componentes</div><div class="v">${fmt(k.soma)} kg</div>${k.foraKg ? `<div class="hint">${k.foraKg} item(ns) fora de kg/g/t não somado(s)</div>` : ""}</div>
-      <div><div class="k">Peso do produto</div><div class="v">${k.ref === null ? "—" : fmt(k.ref) + " kg"}</div></div>
-      <div><div class="k">Conferência</div><div class="v ${k.cls}">${k.txt}</div></div>`;
-  } else $("cadCheck").hidden = true;
+  $("cadCheck").hidden = true;
   $("btExcluirTudo").disabled = !valido || !lista.length || !S.canWrite;
 }
 function renderFicha(){
@@ -570,10 +557,7 @@ function renderFicha(){
   $("fichaLista").innerHTML = !valido ? `<tr><td colspan="7" class="empty"><strong>Nenhum produto escolhido</strong>Digite o código ou o nome no campo Produto.</td></tr>`
     : !lista.length ? `<tr><td colspan="7" class="empty"><strong>Este produto ainda não tem composição</strong>Cadastre os componentes na aba Cadastro.</td></tr>`
     : lista.map((c,i) => `<tr><td class="n">${i+1}</td><td class="c">${c.comp}</td><td>${esc(S.prods.get(c.comp)?.desc ?? "⚠ código não cadastrado")}</td><td class="n">${fmt(c.qtd)}</td><td>${esc(c.un)}</td><td class="n"><strong>${loteOk ? fmt(c.qtd*lote) : "—"}</strong></td><td>${esc(c.obs)}</td></tr>`).join("");
-  if(lista.length && loteOk){
-    const k = conferencia(prod);
-    $("fichaTot").innerHTML = `<tr><td colspan="3">Total em kg (kg, g e t)</td><td class="n">${fmt(k.soma)}</td><td>kg</td><td class="n">${fmt(k.soma*lote)}</td><td>${k.ref !== null ? `Peso do lote: ${fmt(k.ref*lote)} kg` : ""}</td></tr>`;
-  } else $("fichaTot").innerHTML = "";
+  $("fichaTot").innerHTML = "";
 }
 function renderProdutos(){
   const q = $("busca").value.trim().toLowerCase(), cat = $("filtroCat").value;
@@ -590,16 +574,14 @@ function renderProdutos(){
 function renderResumo(){
   const todos = [...S.prods.values()], total = todos.length;
   const fab = todos.filter(p => p.emb !== "Insumo"), com = fab.filter(p => compDe(p.cod).length).length;
-  const conf = fab.filter(p => compDe(p.cod).length && conferencia(p.cod).cls === "ok").length;
   $("tiles").innerHTML = [
     ["Itens no catálogo", total, `${total - fab.length} insumo(s)`],
     ["Com composição", com, fab.length ? `${Math.round(com/fab.length*100)}% dos produtos` : ""],
     ["Sem composição", fab.length - com, "produtos que faltam cadastrar"],
-    ["Peso confere", conf, `de ${com} com composição`],
   ].map(([k,v,s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
   const grupo = campo => { const m = new Map(); todos.forEach(p => m.set(p[campo], (m.get(p[campo])||[]).concat(p))); return [...m].sort((a,b) => b[1].length - a[1].length || a[0].localeCompare(b[0],"pt-BR")); };
   const max = Math.max(1, ...grupo("cat").map(g => g[1].length));
-  $("resCat").innerHTML = grupo("cat").map(([c,l]) => `<tr><td>${esc(c)}</td><td class="n">${l.length}</td><td class="n">${total ? fmt(l.length/total*100,1) : 0}%</td><td><div class="bar"><i style="width:${l.length/max*100}%"></i></div></td></tr>`).join("")
+  $("resCat").innerHTML = grupo("cat").map(([c,l]) => `<tr><td>${esc(c)}</td><td class="n">${l.length}</td><td class="n">${total ? fmt(l.length/total*100,1,1) : 0}%</td><td><div class="bar"><i style="width:${l.length/max*100}%"></i></div></td></tr>`).join("")
     + `<tr><td><strong>Total</strong></td><td class="n"><strong>${total}</strong></td><td class="n">100%</td><td></td></tr>`;
   $("resEmb").innerHTML = grupo("emb").map(([e,l]) => `<tr><td>${esc(e)}</td><td class="n">${l.length}</td><td class="n">${e === "Insumo" ? "—" : l.filter(p => compDe(p.cod).length).length}</td></tr>`).join("");
 }
